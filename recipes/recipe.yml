@@ -80,34 +80,37 @@ modules:
 
   - type: shell
     commands:
-      - |
-        set -euo pipefail
-        install -d /opt/fooocus
-        if [ ! -d /opt/fooocus/.git ]; then
-          git clone --depth=1 https://github.com/lllyasviel/Fooocus.git /opt/fooocus
-        else
-          git -C /opt/fooocus fetch --depth=1 origin
-          git -C /opt/fooocus reset --hard origin/master
-        fi
-        python3 -m venv /opt/fooocus/.venv
-        /opt/fooocus/.venv/bin/pip install --upgrade pip
-        /opt/fooocus/.venv/bin/pip install -r /opt/fooocus/requirements_versions.txt
-      - |
-        set -euo pipefail
-        install -d /opt/comfyui
-        if [ ! -d /opt/comfyui/.git ]; then
-          git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /opt/comfyui
-        else
-          git -C /opt/comfyui fetch --depth=1 origin
-          git -C /opt/comfyui reset --hard origin/master
-        fi
-        python3 -m venv /opt/comfyui/.venv
-        /opt/comfyui/.venv/bin/pip install --upgrade pip
-        /opt/comfyui/.venv/bin/pip install -r /opt/comfyui/requirements.txt
-      - |
-        set -euo pipefail
-        install -d /opt/lmstudio
-        curl -L "https://releases.lmstudio.ai/linux/x64/latest" -o /opt/lmstudio/LMStudio.AppImage
-        chmod +x /opt/lmstudio/LMStudio.AppImage
+      - name: Install Fooocus
+        run: |
+          set -euo pipefail
+          install -d /opt/fooocus
+          if [ ! -d /opt/fooocus/.git ]; then
+            git clone --depth=1 https://github.com/lllyasviel/Fooocus.git /opt/fooocus
+          else
+            git -C /opt/fooocus fetch --depth=1 origin
+            git -C /opt/fooocus reset --hard origin/master
+          fi
+          python3 -m venv /opt/fooocus/.venv
+          /opt/fooocus/.venv/bin/pip install --upgrade pip
+          /opt/fooocus/.venv/bin/pip install -r /opt/fooocus/requirements_versions.txt
+      - name: Install ComfyUI
+        run: |
+          set -euo pipefail
+          install -d /opt/comfyui
+          if [ ! -d /opt/comfyui/.git ]; then
+            git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /opt/comfyui
+          else
+            git -C /opt/comfyui fetch --depth=1 origin
+            git -C /opt/comfyui reset --hard origin/master
+          fi
+          python3 -m venv /opt/comfyui/.venv
+          /opt/comfyui/.venv/bin/pip install --upgrade pip
+          /opt/comfyui/.venv/bin/pip install -r /opt/comfyui/requirements.txt
+      - name: Install LM Studio
+        run: |
+          set -euo pipefail
+          install -d /opt/lmstudio
+          curl -L "https://releases.lmstudio.ai/linux/x64/latest" -o /opt/lmstudio/LMStudio.AppImage
+          chmod +x /opt/lmstudio/LMStudio.AppImage
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
