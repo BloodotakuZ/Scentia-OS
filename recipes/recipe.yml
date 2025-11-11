@@ -80,7 +80,8 @@ modules:
 
   - type: shell
     commands:
-      - command: |
+      - name: Install Fooocus
+        command: |
           set -euo pipefail
           install -d /opt/fooocus
           if [ ! -d /opt/fooocus/.git ]; then
@@ -92,7 +93,8 @@ modules:
           python3 -m venv /opt/fooocus/.venv
           /opt/fooocus/.venv/bin/pip install --upgrade pip
           /opt/fooocus/.venv/bin/pip install -r /opt/fooocus/requirements_versions.txt
-      - command: |
+      - name: Install ComfyUI
+        command: |
           set -euo pipefail
           install -d /opt/comfyui
           if [ ! -d /opt/comfyui/.git ]; then
@@ -104,7 +106,8 @@ modules:
           python3 -m venv /opt/comfyui/.venv
           /opt/comfyui/.venv/bin/pip install --upgrade pip
           /opt/comfyui/.venv/bin/pip install -r /opt/comfyui/requirements.txt
-      - command: |
+      - name: Install LM Studio
+        command: |
           set -euo pipefail
           install -d /opt/lmstudio
           curl -L "https://releases.lmstudio.ai/linux/x64/latest" -o /opt/lmstudio/LMStudio.AppImage
