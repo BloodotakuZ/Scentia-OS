@@ -6,8 +6,8 @@ name: Scentia-OS
 description: This is my personal OS image.
 
 # the base image to build on top of (FROM) and the version tag to use
-base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 42 # latest is also supported if you want new updates ASAP
+base-image: ghcr.io/ublue-os/bazzite-nvidia
+image-version: latest # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
@@ -21,10 +21,45 @@ modules:
     repos:
       copr:
         - atim/starship
+        - jakoolits/Hyprland
     install:
       packages:
         - micro
         - starship
+        - cuda
+        - gcc
+        - gcc-c++
+        - clang
+        - llvm
+        - cmake
+        - ninja-build
+        - make
+        - git
+        - curl
+        - aria2
+        - tar
+        - ffmpeg
+        - python3
+        - python3-pip
+        - python3-virtualenv
+        - python3-devel
+        - wine
+        - wine-mono
+        - wine-gecko
+        - hyprland
+        - xdg-desktop-portal-hyprland
+        - hyprpaper
+        - waybar
+        - rofi-wayland
+        - grim
+        - slurp
+        - swaylock
+        - fuse
+        - fuse-libs
+        - mesa-libEGL
+        - mesa-libGL
+        - mesa-libGLU
+        - libglvnd
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
@@ -40,6 +75,39 @@ modules:
         install: # system flatpaks we want all users to have and not remove
           - org.mozilla.firefox
           - org.gnome.Loupe
+          - com.heroicgameslauncher.hgl
       - scope: user # Also add Flathub user repo, but no user packages
+
+  - type: shell
+    commands:
+      - command: |
+          set -euo pipefail
+          install -d /opt/fooocus
+          if [ ! -d /opt/fooocus/.git ]; then
+            git clone --depth=1 https://github.com/lllyasviel/Fooocus.git /opt/fooocus
+          else
+            git -C /opt/fooocus fetch --depth=1 origin
+            git -C /opt/fooocus reset --hard origin/master
+          fi
+          python3 -m venv /opt/fooocus/.venv
+          /opt/fooocus/.venv/bin/pip install --upgrade pip
+          /opt/fooocus/.venv/bin/pip install -r /opt/fooocus/requirements_versions.txt
+      - command: |
+          set -euo pipefail
+          install -d /opt/comfyui
+          if [ ! -d /opt/comfyui/.git ]; then
+            git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /opt/comfyui
+          else
+            git -C /opt/comfyui fetch --depth=1 origin
+            git -C /opt/comfyui reset --hard origin/master
+          fi
+          python3 -m venv /opt/comfyui/.venv
+          /opt/comfyui/.venv/bin/pip install --upgrade pip
+          /opt/comfyui/.venv/bin/pip install -r /opt/comfyui/requirements.txt
+      - command: |
+          set -euo pipefail
+          install -d /opt/lmstudio
+          curl -L "https://releases.lmstudio.ai/linux/x64/latest" -o /opt/lmstudio/LMStudio.AppImage
+          chmod +x /opt/lmstudio/LMStudio.AppImage
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
