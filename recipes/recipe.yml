@@ -9,29 +9,29 @@ image-version: latest
 modules:
 
   ##########################################################
-  # FILES
+  # FILES (scripts + simple config)
   ##########################################################
   - type: files
     files:
       - source: lactd.service
         destination: /etc/systemd/system/lactd.service
+
       - source: environment
         destination: /etc/environment
+
       - source: build-hyprland.sh
         destination: /usr/local/bin/build-hyprland.sh
 
   ##########################################################
-  # ADD NVIDIA CUDA REPO (needed before dnf install)
+  # ADD NVIDIA CUDA REPO (strict v0 syntax)
   ##########################################################
   - type: script
     scripts:
-      - |
-        echo "Adding NVIDIA CUDA repo..."
-        curl -L https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/cuda-fedora39.repo \
-          -o /etc/yum.repos.d/cuda.repo
+      - echo "Adding NVIDIA CUDA repo..."
+      - curl -L https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/cuda-fedora39.repo -o /etc/yum.repos.d/cuda.repo
 
   ##########################################################
-  # DNF – install packages INCLUDING CUDA + cuDNN
+  # DNF – install all packages including CUDA + cuDNN
   ##########################################################
   - type: dnf
     install:
@@ -52,7 +52,7 @@ modules:
         - python3-pip
         - python3-mako
 
-        # Hyprland build deps
+        # Hyprland / wlroots build dependencies
         - wlroots-devel
         - wayland-devel
         - wayland-protocols-devel
@@ -65,7 +65,7 @@ modules:
         - libwayland-egl-devel
         - libxkbcommon-x11-devel
 
-        # Desktop apps
+        # Desktop apps / runtime
         - hyprland
         - waybar
         - rofi-wayland
@@ -74,7 +74,7 @@ modules:
         - slurp
         - swaylock
 
-        # Gaming tools
+        # Gaming stack
         - gamemode
         - mangohud
         - mangohud-core
@@ -86,7 +86,7 @@ modules:
         - lact
 
         ##################################################
-        # CUDA + cuDNN (REAL Fedora packages from NVIDIA)
+        # CUDA + cuDNN (REAL Fedora NVIDIA repo names)
         ##################################################
         - cuda-toolkit-12-4
         - cuda-libraries-12-4
