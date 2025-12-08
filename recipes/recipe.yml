@@ -78,4 +78,23 @@ modules:
         - firefox
         - firefox-langpacks
 
-  #####################################
+  ##########################################################
+  # SCRIPT / BUILD: compile & install Hyprland from source
+  ##########################################################
+  - type: script
+    path: /usr/local/bin/build-hyprland.sh
+
+  ##########################################################
+  # FLATPAKS
+  ##########################################################
+  - type: default-flatpaks
+    configurations:
+      - scope: system
+        install:
+          - org.mozilla.firefox
+          - org.gnome.Loupe
+
+  ##########################################################
+  # SIGNING
+  ##########################################################
+  - type: signing
