@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: Scentia-OS
-description: Fully optimized NVIDIA-focused Scentia-OS image with AI tools, gaming enhancements, and system tuning.
+name: scentia-os
+description: Scentia OS – Optimized NVIDIA/Bazzite environment with Hyprland tuning and performance enhancements
 
 base-image: ghcr.io/ublue-os/bazzite-nvidia
 image-version: latest
@@ -9,10 +9,11 @@ image-version: latest
 modules:
 
   ##########################################################
-  # SYSTEM FILES + NVIDIA + HYPRLAND OPTIMIZATIONS
+  # SYSTEM FILES + NVIDIA + HYPRLAND ENV
   ##########################################################
   - type: files
     files:
+      # System folder copy
       - source: system
         destination: /
 
@@ -32,7 +33,7 @@ modules:
           WantedBy=multi-user.target
         path: /etc/systemd/system/nvidia-persistenced.service
 
-      # NVIDIA Powerd
+      # NVIDIA Power Service
       - content: |
           [Unit]
           Description=NVIDIA Power Management
@@ -45,17 +46,17 @@ modules:
           WantedBy=graphical.target
         path: /etc/systemd/system/nvidia-powerd.service
 
-      # Hyprland + NVIDIA Environment
+      # Hyprland / NVIDIA Environment Variables
       - content: |
-          env = LIBVA_DRIVER_NAME,nvidia
-          env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-          env = GBM_BACKEND,nvidia-drm
-          env = __GL_GSYNC_ALLOWED,1
-          env = __GL_VRR_ALLOWED,1
-          env = __GL_MaxFramesAllowed,1
+          LIBVA_DRIVER_NAME=nvidia
+          __GLX_VENDOR_LIBRARY_NAME=nvidia
+          GBM_BACKEND=nvidia-drm
+          __GL_GSYNC_ALLOWED=1
+          __GL_VRR_ALLOWED=1
+          __GL_MaxFramesAllowed=1
         path: /etc/environment
 
-      # Coolbits for fan & OC
+      # NVIDIA Coolbits (Overclock + Fan Control)
       - content: |
           Section "Device"
               Identifier "Nvidia Card"
@@ -98,7 +99,7 @@ modules:
           }
         path: /etc/lact/config.json
 
-      # LACT OC Profiles
+      # LACT Overclock Profiles
       - content: |
           [profile.default]
           core_offset = 0
@@ -116,7 +117,7 @@ modules:
           power_limit = "max"
         path: /etc/lact/profiles.toml
 
-      # LACT Desktop Entry
+      # Desktop Entry Launcher
       - content: |
           [Desktop Entry]
           Type=Application
@@ -128,7 +129,7 @@ modules:
         path: /usr/share/applications/lact.desktop
 
   ##########################################################
-  # DNF — SYSTEM, GPU, AI, GAMING, HEROIC, LACT
+  # DNF PACKAGES (Native Heroic, LACT, Dev Tools, NVIDIA)
   ##########################################################
   - type: dnf
     repos:
@@ -140,6 +141,7 @@ modules:
 
     install:
       packages:
+        # Essentials
         - micro
         - starship
         - git
@@ -148,7 +150,7 @@ modules:
         - tar
         - ffmpeg
 
-        # Dev tools
+        # Development
         - gcc
         - gcc-c++
         - clang
@@ -157,19 +159,18 @@ modules:
         - ninja-build
         - make
 
-        # Python build stack
+        # Python
         - python3
         - python3-pip
         - python3-virtualenv
         - python3-devel
-        - python3-wheel
         - python3-setuptools
-        - python3-build
+        - python3-wheel
 
-        # Wine
+        # Wine Gaming Stack
         - wine
-        - wine-mono
         - wine-gecko
+        - wine-mono
 
         # Hyprland
         - hyprland
@@ -181,20 +182,16 @@ modules:
         - slurp
         - swaylock
 
-        # fuse3
+        # FUSE / Mesa
         - fuse3
         - fuse3-libs
-
-        # mesa
         - mesa-libEGL
         - mesa-libGL
         - mesa-libGLU
-        - libglvnd
 
-        # CUDA + AI
+        # CUDA + NVIDIA compute stack
         - cuda
         - cuda-cudart
-        - cuda-nvml-devel
         - cuda-nvrtc
         - cuda-nvtx
         - libcublas
@@ -202,22 +199,21 @@ modules:
         - cudnn8
         - cudnn8-devel
 
-        # Gaming
+        # Gaming / Vulkan tools
         - gamemode
         - gamemode-devel
-        - mango
         - mangohud
-        - mangohud-core
+        - mango
         - vkBasalt
-        - vulkan-loader
         - vulkan-tools
+        - vulkan-loader
         - vulkan-headers
         - vulkan-validation-layers
 
-        # Heroic Native
+        # Native Heroic build
         - heroic-games-launcher-bin
 
-        # LACT native
+        # Native LACT
         - lact
 
     remove:
@@ -226,7 +222,7 @@ modules:
         - firefox-langpacks
 
   ##########################################################
-  # FLATPAKS
+  # DEFAULT FLATPAKS
   ##########################################################
   - type: default-flatpaks
     configurations:
@@ -236,11 +232,6 @@ modules:
           - org.mozilla.firefox
           - org.gnome.Loupe
       - scope: user
-
-  ##########################################################
-  # SCRIPT MODULES — AI INSTALLERS
-  ##########################################################
-
 
   ##########################################################
   # SIGNING MODULE
