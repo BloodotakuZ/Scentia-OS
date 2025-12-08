@@ -140,6 +140,7 @@ modules:
 
     install:
       packages:
+        # System utilities
         - micro
         - starship
         - git
@@ -181,7 +182,7 @@ modules:
         - slurp
         - swaylock
 
-        # modern fuse
+        # fuse3
         - fuse3
         - fuse3-libs
 
@@ -240,50 +241,52 @@ modules:
   ##########################################################
   # SCRIPT MODULES — AI TOOL INSTALLERS
   ##########################################################
+
   - type: script
-    commands:
-      - name: Install Fooocus
-        run: |
-          set -euo pipefail
-          install -d /opt/fooocus
-          if [ ! -d /opt/fooocus/.git ]; then
-            git clone --depth=1 https://github.com/lllyasviel/Fooocus.git /opt/fooocus
-          else
-            git -C /opt/fooocus fetch --depth=1 origin
-            git -C /opt/fooocus reset --hard origin/master
-          fi
-          if [ ! -d /opt/fooocus/.venv ]; then
-            python3 -m venv /opt/fooocus/.venv
-          fi
-          /opt/fooocus/.venv/bin/python -m pip install --upgrade pip setuptools wheel
-          /opt/fooocus/.venv/bin/python -m pip install -r /opt/fooocus/requirements_versions.txt
+    name: Install Fooocus
+    run: |
+      set -euo pipefail
+      install -d /opt/fooocus
+      if [ ! -d /opt/fooocus/.git ]; then
+        git clone --depth=1 https://github.com/lllyasviel/Fooocus.git /opt/fooocus
+      else
+        git -C /opt/fooocus fetch --depth=1 origin
+        git -C /opt/fooocus reset --hard origin/master
+      fi
+      if [ ! -d /opt/fooocus/.venv ]; then
+        python3 -m venv /opt/fooocus/.venv
+      fi
+      /opt/fooocus/.venv/bin/python -m pip install --upgrade pip setuptools wheel
+      /opt/fooocus/.venv/bin/python -m pip install -r /opt/fooocus/requirements_versions.txt
 
-      - name: Install ComfyUI
-        run: |
-          set -euo pipefail
-          install -d /opt/comfyui
-          if [ ! -d /opt/comfyui/.git ]; then
-            git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /opt/comfyui
-          else
-            git -C /opt/comfyui fetch --depth=1 origin
-            git -C /opt/comfyui reset --hard origin/master
-          fi
-          if [ ! -d /opt/comfyui/.venv ]; then
-            python3 -m venv /opt/comfyui/.venv
-          fi
-          /opt/comfyui/.venv/bin/python -m pip install --upgrade pip setuptools wheel
-          /opt/comfyui/.venv/bin/python -m pip install -r /opt/comfyui/requirements.txt
+  - type: script
+    name: Install ComfyUI
+    run: |
+      set -euo pipefail
+      install -d /opt/comfyui
+      if [ ! -d /opt/comfyui/.git ]; then
+        git clone --depth=1 https://github.com/comfyanonymous/ComfyUI.git /opt/comfyui
+      else
+        git -C /opt/comfyui fetch --depth=1 origin
+        git -C /opt/comfyui reset --hard origin/master
+      fi
+      if [ ! -d /opt/comfyui/.venv ]; then
+        python3 -m venv /opt/comfyui/.venv
+      fi
+      /opt/comfyui/.venv/bin/python -m pip install --upgrade pip setuptools wheel
+      /opt/comfyui/.venv/bin/python -m pip install -r /opt/comfyui/requirements.txt
 
-      - name: Install LM Studio
-        run: |
-          set -euo pipefail
-          install -d /opt/lmstudio
-          curl -fL "https://releases.lmstudio.ai/linux/x64/latest" -o /opt/lmstudio/LMStudio.AppImage
-          if [ ! -s /opt/lmstudio/LMStudio.AppImage ]; then
-            echo "LM Studio download failed" >&2
-            exit 1
-          fi
-          chmod +x /opt/lmstudio/LMStudio.AppImage
+  - type: script
+    name: Install LM Studio
+    run: |
+      set -euo pipefail
+      install -d /opt/lmstudio
+      curl -fL "https://releases.lmstudio.ai/linux/x64/latest" -o /opt/lmstudio/LMStudio.AppImage
+      if [ ! -s /opt/lmstudio/LMStudio.AppImage ]; then
+        echo "LM Studio download failed" >&2
+        exit 1
+      fi
+      chmod +x /opt/lmstudio/LMStudio.AppImage
 
   ##########################################################
   # SIGNING MODULE
