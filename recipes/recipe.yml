@@ -2,33 +2,41 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 
 name: scentia-os
-description: "Scentia OS – Hyprland (built from source) + LACT + Dev + Gaming + CUDA"
+description: "Scentia OS – Hyprland + CUDA + cuDNN + Gaming + Dev"
 base-image: ghcr.io/ublue-os/bazzite-nvidia
 image-version: latest
 
 modules:
 
   ##########################################################
-  # FILES (scripts + simple config)
+  # FILES
   ##########################################################
   - type: files
     files:
       - source: lactd.service
         destination: /etc/systemd/system/lactd.service
-
       - source: environment
         destination: /etc/environment
-
       - source: build-hyprland.sh
         destination: /usr/local/bin/build-hyprland.sh
 
   ##########################################################
-  # DNF — runtime + developer + build dependencies
+  # ADD NVIDIA CUDA REPO (needed before dnf install)
+  ##########################################################
+  - type: script
+    scripts:
+      - |
+        echo "Adding NVIDIA CUDA repo..."
+        curl -L https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/cuda-fedora39.repo \
+          -o /etc/yum.repos.d/cuda.repo
+
+  ##########################################################
+  # DNF – install packages INCLUDING CUDA + cuDNN
   ##########################################################
   - type: dnf
     install:
       packages:
-        # Developer / general tools
+        # Dev tools
         - git
         - curl
         - gcc
@@ -44,7 +52,7 @@ modules:
         - python3-pip
         - python3-mako
 
-        # Hyprland / wlroots build dependencies
+        # Hyprland build deps
         - wlroots-devel
         - wayland-devel
         - wayland-protocols-devel
@@ -57,7 +65,7 @@ modules:
         - libwayland-egl-devel
         - libxkbcommon-x11-devel
 
-        # Runtime apps / tools
+        # Desktop apps
         - hyprland
         - waybar
         - rofi-wayland
@@ -66,7 +74,7 @@ modules:
         - slurp
         - swaylock
 
-        # Gaming stack
+        # Gaming tools
         - gamemode
         - mangohud
         - mangohud-core
@@ -74,18 +82,20 @@ modules:
         - vulkan-tools
         - vulkan-validation-layers
 
-        # LACT GPU controller (no COPR needed)
+        # LACT GPU controller
         - lact
 
-        # CUDA stack
-        - cuda
-        - cuda-cudart
-        - cuda-nvrtc
-        - cuda-nvtx
-        - libcublas
-        - libcublas-devel
-        - cudnn8
-        - cudnn8-devel
+        ##################################################
+        # CUDA + cuDNN (REAL Fedora packages from NVIDIA)
+        ##################################################
+        - cuda-toolkit-12-4
+        - cuda-libraries-12-4
+        - cuda-libraries-devel-12-4
+        - cuda-nvml-devel-12-4
+        - cuda-nvrtc-12-4
+        - cuda-cudart-devel-12-4
+        - libcudnn8
+        - libcudnn8-devel
 
     remove:
       packages:
@@ -93,7 +103,7 @@ modules:
         - firefox-langpacks
 
   ##########################################################
-  # SCRIPT: compile & install Hyprland from source
+  # SCRIPT – build Hyprland from source
   ##########################################################
   - type: script
     scripts:
@@ -110,6 +120,6 @@ modules:
           - org.gnome.Loupe
 
   ##########################################################
-  # SIGNING (required)
+  # SIGNING
   ##########################################################
   - type: signing
