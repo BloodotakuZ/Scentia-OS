@@ -1,3 +1,11 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+
+name: scentia-os
+description: "Scentia OS – Hyprland (built from source) + LACT + Dev + Gaming + CUDA"
+base-image: ghcr.io/ublue-os/bazzite-nvidia
+image-version: latest
+
 modules:
 
   ##########################################################
@@ -11,10 +19,10 @@ modules:
       - source: environment
         destination: /etc/environment
 
-      # build script that will compile Hyprland from source during the build
+      # Hyprland build script copied into the image
       - source: build-hyprland.sh
         destination: /usr/local/bin/build-hyprland.sh
-  
+
   ##########################################################
   # DNF — runtime + developer + build dependencies
   ##########################################################
@@ -25,6 +33,7 @@ modules:
 
     install:
       packages:
+        # Developer / general tools
         - git
         - curl
         - gcc
@@ -39,6 +48,8 @@ modules:
         - python3
         - python3-pip
         - python3-mako
+
+        # Hyprland / wlroots build dependencies
         - wlroots-devel
         - wayland-devel
         - wayland-protocols-devel
@@ -50,6 +61,8 @@ modules:
         - libdrm-devel
         - libwayland-egl-devel
         - libxkbcommon-x11-devel
+
+        # Runtime apps / tools
         - hyprland
         - waybar
         - rofi-wayland
@@ -57,13 +70,19 @@ modules:
         - grim
         - slurp
         - swaylock
+
+        # Gaming stack
         - gamemode
         - mangohud
         - mangohud-core
         - vkBasalt
         - vulkan-tools
         - vulkan-validation-layers
+
+        # LACT GPU controller
         - lact
+
+        # CUDA stack
         - cuda
         - cuda-cudart
         - cuda-nvrtc
@@ -95,6 +114,6 @@ modules:
           - org.gnome.Loupe
 
   ##########################################################
-  # SIGNING
+  # SIGNING (required by uBlue images)
   ##########################################################
   - type: signing
