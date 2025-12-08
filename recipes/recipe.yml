@@ -9,10 +9,9 @@ image-version: latest
 modules:
 
   ##########################################################
-  # FILES (scripts + simple config)
+  # FILES
   ##########################################################
   - type: files
-    version: 1
     files:
       - source: lactd.service
         destination: /etc/systemd/system/lactd.service
@@ -24,10 +23,9 @@ modules:
         destination: /usr/local/bin/build-hyprland.sh
 
   ##########################################################
-  # DNF — runtime + developer + build dependencies
+  # DNF — v0 schema (NO version: field)
   ##########################################################
   - type: dnf
-    version: 1
     repos:
       copr:
         - xnorbr/lact
@@ -88,17 +86,16 @@ modules:
         - firefox-langpacks
 
   ##########################################################
-  # SCRIPT: compile & install Hyprland from source
+  # SCRIPT — v0 schema uses "scripts" NOT "path"
   ##########################################################
   - type: script
-    version: 1
-    path: /usr/local/bin/build-hyprland.sh
+    scripts:
+      - /usr/local/bin/build-hyprland.sh
 
   ##########################################################
-  # FLATPAKS
+  # FLATPAKS — no version field allowed
   ##########################################################
   - type: default-flatpaks
-    version: 1
     configurations:
       - scope: system
         install:
@@ -106,7 +103,6 @@ modules:
           - org.gnome.Loupe
 
   ##########################################################
-  # SIGNING (required)
+  # SIGNING — v0 schema
   ##########################################################
   - type: signing
-    version: 1
