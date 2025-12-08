@@ -12,6 +12,7 @@ modules:
   # FILES (scripts + simple config)
   ##########################################################
   - type: files
+    version: 1
     files:
       - source: lactd.service
         destination: /etc/systemd/system/lactd.service
@@ -19,7 +20,6 @@ modules:
       - source: environment
         destination: /etc/environment
 
-      # Hyprland build script copied into the image
       - source: build-hyprland.sh
         destination: /usr/local/bin/build-hyprland.sh
 
@@ -27,13 +27,13 @@ modules:
   # DNF — runtime + developer + build dependencies
   ##########################################################
   - type: dnf
+    version: 1
     repos:
       copr:
         - xnorbr/lact
 
     install:
       packages:
-        # Developer / general tools
         - git
         - curl
         - gcc
@@ -48,8 +48,6 @@ modules:
         - python3
         - python3-pip
         - python3-mako
-
-        # Hyprland / wlroots build dependencies
         - wlroots-devel
         - wayland-devel
         - wayland-protocols-devel
@@ -61,8 +59,6 @@ modules:
         - libdrm-devel
         - libwayland-egl-devel
         - libxkbcommon-x11-devel
-
-        # Runtime apps / tools
         - hyprland
         - waybar
         - rofi-wayland
@@ -70,19 +66,13 @@ modules:
         - grim
         - slurp
         - swaylock
-
-        # Gaming stack
         - gamemode
         - mangohud
         - mangohud-core
         - vkBasalt
         - vulkan-tools
         - vulkan-validation-layers
-
-        # LACT GPU controller
         - lact
-
-        # CUDA stack
         - cuda
         - cuda-cudart
         - cuda-nvrtc
@@ -98,15 +88,17 @@ modules:
         - firefox-langpacks
 
   ##########################################################
-  # SCRIPT / BUILD: compile & install Hyprland from source
+  # SCRIPT: compile & install Hyprland from source
   ##########################################################
   - type: script
+    version: 1
     path: /usr/local/bin/build-hyprland.sh
 
   ##########################################################
   # FLATPAKS
   ##########################################################
   - type: default-flatpaks
+    version: 1
     configurations:
       - scope: system
         install:
@@ -114,6 +106,7 @@ modules:
           - org.gnome.Loupe
 
   ##########################################################
-  # SIGNING (required by uBlue images)
+  # SIGNING (required)
   ##########################################################
   - type: signing
+    version: 1
