@@ -1,132 +1,99 @@
----
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
 
 name: scentia-os
-description: "Scentia OS – Hyprland + CUDA + cuDNN + Gaming + Dev"
+description: Hyprland + CUDA/cuDNN + gaming + dev tools
 base-image: ghcr.io/ublue-os/bazzite-nvidia
 image-version: latest
 
 modules:
-
-  ##########################################################
-  # FILES (scripts + simple config)
-  ##########################################################
+  # Copy config files and scripts into the image
   - type: files
     files:
-      - source: lactd.service
+      - source: files/lactd.service
         destination: /etc/systemd/system/lactd.service
         mode: "0644"
-
-      - source: environment
+      - source: files/environment
         destination: /etc/environment
         mode: "0644"
-
-      - source: build-hyprland.sh
+      - source: files/build-hyprland.sh
         destination: /usr/local/bin/build-hyprland.sh
-        mode: "0755"   # make sure this script is executable in the image
+        mode: "0755"
 
-  ##########################################################
-  # ADD NVIDIA CUDA REPO (strict v0 syntax)
-  ##########################################################
+  # Add CUDA repository so rpm-ostree can resolve CUDA/cuDNN
   - type: script
     scripts:
-      - echo "Adding NVIDIA CUDA repo..."
-      - >
-        curl -fsSL "https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/cuda-fedora39.repo"
-        -o /etc/yum.repos.d/cuda.repo || { echo "Failed to download CUDA repo"; exit 1; }
+      - |
+        set -oue pipefail
+        echo "Adding NVIDIA CUDA repo..."
+        curl -fsSL "https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/cuda-fedora39.repo" \
+          -o /etc/yum.repos.d/cuda.repo
 
-  ##########################################################
-  # DNF – install all packages including CUDA + cuDNN
-  ##########################################################
-  - type: dnf
+  # Layer packages via rpm-ostree (official bluebuild module)
+  - type: rpm-ostree
     install:
-      packages:
-        # Dev tools
-        - git
-        - curl
-        - gcc
-        - gcc-c++
-        - clang
-        - llvm
-        - make
-        - cmake
-        - ninja-build
-        - meson
-        - pkg-config
-        - python3
-        - python3-pip
-        - python3-mako
-
-        # Hyprland / wlroots build dependencies
-        - wlroots-devel
-        - wayland-devel
-        - wayland-protocols-devel
-        - libxkbcommon-devel
-        - libinput-devel
-        - libseat-devel
-        - libevdev-devel
-        - libudev-devel
-        - libdrm-devel
-        - libwayland-egl-devel
-        - libxkbcommon-x11-devel
-
-        # Desktop apps / runtime
-        - hyprland
-        - waybar
-        - rofi-wayland
-        - hyprpaper
-        - grim
-        - slurp
-        - swaylock
-
-        # Gaming stack (note lowercase for package names)
-        - gamemode
-        - mangohud
-        - mangohud-core
-        - vkbasalt
-        - vulkan-tools
-        - vulkan-validation-layers
-
-        # LACT GPU controller
-        - lact
-
-        ##################################################
-        # CUDA + cuDNN (REAL Fedora NVIDIA repo names)
-        ##################################################
-        - cuda-toolkit-12-4
-        - cuda-libraries-12-4
-        - cuda-libraries-devel-12-4
-        - cuda-nvml-devel-12-4
-        - cuda-nvrtc-12-4
-        - cuda-cudart-devel-12-4
-        - libcudnn8
-        - libcudnn8-devel
-
+      - git
+      - curl
+      - gcc
+      - gcc-c++
+      - clang
+      - llvm
+      - make
+      - cmake
+      - ninja-build
+      - meson
+      - pkg-config
+      - python3
+      - python3-pip
+      - python3-mako
+      - wlroots-devel
+      - wayland-devel
+      - wayland-protocols-devel
+      - libxkbcommon-devel
+      - libinput-devel
+      - libseat-devel
+      - libevdev-devel
+      - libudev-devel
+      - libdrm-devel
+      - libwayland-egl-devel
+      - libxkbcommon-x11-devel
+      - hyprland
+      - waybar
+      - rofi-wayland
+      - hyprpaper
+      - grim
+      - slurp
+      - swaylock
+      - gamemode
+      - mangohud
+      - mangohud-core
+      - vkbasalt
+      - vulkan-tools
+      - vulkan-validation-layers
+      - lact
+      - cuda-toolkit-12-4
+      - cuda-libraries-12-4
+      - cuda-libraries-devel-12-4
+      - cuda-nvml-devel-12-4
+      - cuda-nvrtc-12-4
+      - cuda-cudart-devel-12-4
+      - libcudnn8
+      - libcudnn8-devel
     remove:
-      packages:
-        - firefox
-        - firefox-langpacks
+      - firefox
+      - firefox-langpacks
 
-  ##########################################################
-  # SCRIPT – build Hyprland from source
-  ##########################################################
+  # Build Hyprland from source after dependencies are present
   - type: script
     scripts:
-      - /usr/local/bin/build-hyprland.sh
+      - |
+        set -oue pipefail
+        /usr/local/bin/build-hyprland.sh
 
-  ##########################################################
-  # FLATPAKS
-  ##########################################################
+  # Install Flatpaks using the default bluebuild module shape
   - type: default-flatpaks
-    configurations:
-      - scope: system
-        install:
-          - org.mozilla.firefox
-          - org.gnome.Loupe
+    system:
+      install:
+        - org.mozilla.firefox
+        - org.gnome.Loupe
 
-  ##########################################################
-  # SIGNING
-  ##########################################################
-  # The signing module usually needs configuration (gpg key, passphrase, etc).
-  # If you do not have signing configured yet, leave this out or add config below.
   # - type: signing
