@@ -55,7 +55,6 @@ modules:
       - swaylock
       - gamemode
       - mangohud
-      - vkbasalt
       - vulkan-tools
       - vulkan-validation-layers
       - cuda-toolkit-12-4
