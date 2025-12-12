@@ -9,13 +9,13 @@ modules:
   # Copy config files and scripts into the image
   - type: files
     files:
-      - source: files/lactd.service
+      - source: lactd.service
         destination: /etc/systemd/system/lactd.service
         mode: "0644"
-      - source: files/environment
+      - source: environment
         destination: /etc/environment
         mode: "0644"
-      - source: files/build-hyprland.sh
+      - source: build-hyprland.sh
         destination: /usr/local/bin/build-hyprland.sh
         mode: "0755"
 
